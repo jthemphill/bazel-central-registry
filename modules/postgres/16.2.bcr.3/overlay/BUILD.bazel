@@ -1042,12 +1042,22 @@ write_file(
     newline = "unix",
 )
 
+write_file(
+    name = "default_config_os.h",
+    out = "src/include/port/default_config_os.h",
+    content = """\
+/* src/include/port/default_config_os.h.  Generated from Bazel.  */
+""".splitlines(),
+    newline = "unix",
+)
+
 copy_file(
     name = "pg_config_os",
     src = select({
         "@platforms//os:linux": "src/include/port/linux.h",
         "@platforms//os:macos": "src/include/port/darwin.h",
         "@platforms//os:windows": "src/include/port/win32.h",
+        "//conditions:default": "src/include/port/default_os.h",
     }),
     out = "src/include/pg_config_os.h",
 )
@@ -1096,6 +1106,11 @@ LIBPORTS_LINUX = [
 
 LIBPORTS_MACOS = [
     "src/port/explicit_bzero.c",
+    "src/port/thread.c",
+]
+
+LIBPORTS_WASI = [
+    "src/port/getpeereid.c",
     "src/port/thread.c",
 ]
 
@@ -1232,6 +1247,7 @@ cc_library(
     srcs = select({
         "@platforms//os:linux": LIBPQ_BASE + LIBPQ_NOT_WINDOWS + LIBCOMMON_BASE + LIBCOMMON_NOT_WINDOWS + LIBPORTS_BASE + LIBPORTS_LINUX,
         "@platforms//os:macos": LIBPQ_BASE + LIBPQ_NOT_WINDOWS + LIBCOMMON_BASE + LIBCOMMON_NOT_WINDOWS + LIBPORTS_BASE + LIBPORTS_MACOS,
+        "@platforms//os:wasi": LIBPQ_BASE + LIBPQ_NOT_WINDOWS + LIBCOMMON_BASE + LIBCOMMON_NOT_WINDOWS + LIBPORTS_BASE + LIBPORTS_WASI,
         "@platforms//os:windows": LIBPQ_BASE + LIBPQ_WINDOWS + LIBCOMMON_BASE + LIBCOMMON_WINDOWS + LIBPORTS_BASE + LIBPORTS_WINDOWS,
     }),
     hdrs = LIBPQ_PUBLIC_HDRS,
@@ -1258,6 +1274,11 @@ cc_library(
         ],
         "@platforms//os:macos": [
             "_FORTIFY_SOURCE=0",
+        ],
+        "@platforms//os:wasi": [
+            "_WASI_EMULATED_MMAN",
+            "_WASI_EMULATED_PROCESS_CLOCKS",
+            "_WASI_EMULATED_SIGNAL",
         ],
         "@platforms//os:windows": [
             "WIN32",
