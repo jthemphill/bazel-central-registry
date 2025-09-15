@@ -142,6 +142,7 @@ ALL_OPENSSL_APP_SRCS = COMMON_OPENSSL_APP_SRCS + select({
     "//configs:linux_x86_64": _LINUX_X86_64_OPENSSL_APP_SRCS,
     "//configs:windows_arm64": fix_paths_for_windows(_WINDOWS_ARM64_OPENSSL_APP_SRCS) + MISSING_OPENSSL_WINDOWS_SRCS,
     "//configs:windows_x64": fix_paths_for_windows(_WINDOWS_X86_64_OPENSSL_APP_SRCS) + MISSING_OPENSSL_WINDOWS_SRCS,
+    "//conditions:default": [],
 })
 
 OPENSSL_APP_NIX_COPTS = [
@@ -450,6 +451,7 @@ ALL_LIBSSL_SRCS = COMMON_LIBSSL_SRCS + select({
     "//configs:linux_x86_64": _LINUX_X86_64_LIBSSL_SRCS,
     "//configs:windows_arm64": fix_paths_for_windows(_WINDOWS_ARM64_LIBSSL_SRCS),
     "//configs:windows_x64": fix_paths_for_windows(_WINDOWS_X86_64_LIBSSL_SRCS),
+    "//conditions:default": [],
 })
 
 EXISTING_LIBSSL_HDRS = glob(
